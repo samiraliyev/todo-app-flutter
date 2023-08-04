@@ -1,0 +1,8 @@
+{
+    "@@locale": "en",
+    "saveButton": "SAVE",
+    "task": "Task",
+    "appName" : "To Do",
+    "hintText" : "add new task",
+    "errorBar" : "Please full field"
+}

@@ -1,0 +1,8 @@
+{
+    "@@locale": "az",
+    "saveButton": "Yadda saxla",
+    "task": "Tapsiriq",
+    "appName" : "Gorulecek isler",
+    "hintText" : "yeni tapsiriq elave et",
+    "errorBar": "Boslugu doldurun"
+}

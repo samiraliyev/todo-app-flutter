@@ -1,0 +1,8 @@
+{
+    "@@locale": "tr",
+    "saveButton": "Kayd et",
+    "task": "Gorevler",
+    "appName" : "Yapilacaklar listesi",
+    "hintText" : "yeni gorev ilave et",
+    "errorBar" : "Lutfen boslugu doldurun"
+}

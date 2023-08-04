@@ -1,44 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:todo_app/providers/home_provider.dart';
 import 'package:todo_app/screens/home_page.dart';
 import 'package:provider/provider.dart';
 import 'constants/theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
-      create: (context) {
-        return HomeProvider();
-      },
+      create: (context) => HomeProvider(),
     )
   ], child: const MyWidget()));
 }
 
-class MyWidget extends StatefulWidget {
+class MyWidget extends StatelessWidget {
   const MyWidget({super.key});
 
   @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<HomeProvider>().readTheme();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: context.watch<HomeProvider>().isRedTheme
-          ? AppThemeData().redTheme
-          : AppThemeData().greenTheme,
-      debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+    return Consumer(
+      builder: (context, HomeProvider provider, child) {
+        return MaterialApp(
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          locale: Locale(provider.currentLang),
+          theme: provider.isRedTheme
+              ? AppThemeData().redTheme
+              : AppThemeData().greenTheme,
+          debugShowCheckedModeBanner: false,
+          home: const HomePage(),
+        );
+      },
     );
   }
 }

@@ -1,37 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../model/task_model.dart';
 
 class HomeProvider extends ChangeNotifier {
-  final _getStorage = GetStorage();
+  String currentLang = 'en';
+
   List<TaskModel> items = [];
   final TextEditingController controller = TextEditingController();
   bool isRedTheme = false;
+  SharedPreferences? sharedPref;
 
-  Future<void> addTask() async {
-    items.add(TaskModel(controller.text, false));
+  HomeProvider() {
+    init();
+  }
 
-    _getStorage.write("item", items);
-    controller.text = '';
+  Future<void> init() async {
+    sharedPref = await SharedPreferences.getInstance();
+    final itemList = sharedPref!.getStringList('task');
+    items =
+        itemList!.map((e) => TaskModel(title: e, isSelected: false)).toList();
 
+    isRedTheme = sharedPref?.getBool('theme') ?? false;
+    readLanguage();
     notifyListeners();
   }
 
-  Future<void> readTask() async {
-    items = await _getStorage.read('item');
+  void addTask() {
+    items.add(TaskModel(title: controller.text, isSelected: false));
 
+    controller.text = '';
+    saveData();
+    notifyListeners();
+  }
+
+  Future<void> saveData() async {
+    final itemList = items.map((e) => e.title).toList();
+    await sharedPref!.setStringList('task', itemList);
+  }
+
+  Future<void> readTask() async {
     notifyListeners();
   }
 
   void removeTask(index) {
     items.removeAt(index);
+    saveData();
     notifyListeners();
   }
 
   void changeCheck(bool value, int index) {
     items[index].isSelected = value;
+    saveData();
     notifyListeners();
   }
 
@@ -43,17 +64,30 @@ class HomeProvider extends ChangeNotifier {
           actions: [
             ElevatedButton(
               onPressed: () {
+                if (controller.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.errorBar,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: Colors.red,
+                  ));
+                  return;
+                }
+
                 addTask();
+
                 Navigator.pop(context);
               },
-              child: const Text('SAVE'),
+              child: Text(AppLocalizations.of(context)!.saveButton),
             ),
           ],
           title: TextField(
             autofocus: true,
             controller: controller,
-            decoration: const InputDecoration(
-              hintText: "add new task",
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.hintText,
             ),
           ),
         );
@@ -63,15 +97,19 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> changeTheme(bool value) async {
     isRedTheme = value;
-    SharedPreferences sharedprefs = await SharedPreferences.getInstance();
-    sharedprefs.setBool("theme", isRedTheme);
+    await sharedPref?.setBool("theme", isRedTheme);
     notifyListeners();
   }
 
-  Future<void> readTheme() async {
-    SharedPreferences sharedprefs = await SharedPreferences.getInstance();
+  Future<void> changeLang(String name) async {
+    currentLang = name;
+    await sharedPref?.setString("lang", currentLang);
+    notifyListeners();
+  }
 
-    isRedTheme = sharedprefs.getBool('theme') ?? false;
+  void readLanguage() {
+    currentLang = sharedPref?.getString("lang") ?? '';
+
     notifyListeners();
   }
 }

@@ -2,5 +2,5 @@ class TaskModel {
   final String title;
   bool isSelected;
 
-  TaskModel(this.title, this.isSelected);
+  TaskModel({required this.title, required this.isSelected});
 }
