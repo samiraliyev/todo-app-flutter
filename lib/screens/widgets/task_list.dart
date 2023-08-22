@@ -53,7 +53,8 @@ class TaskList extends StatelessWidget {
                           },
                           child: Icon(
                             Icons.delete,
-                            color: Theme.of(context).canvasColor,
+                            color:
+                                provider.isRedTheme ? Colors.red : Colors.green,
                           ),
                         ),
                       ),
